@@ -8,6 +8,7 @@ Point). Будет ли прямая, проходящая через эти т�
 #include <iostream>
 #include <Windows.h>
 using std::cout;
+using std::cin;
 using std::endl;
 
 // глобальное объявление структуры "Point"
@@ -17,6 +18,8 @@ struct Point
 	int x, y;
 };
 
+// Функция определяет будет ли прямая, проходящая через эти точки, параллельна
+// оси ординат или оси абсцисс 
 int IsParallelToOrdAxisOrAbscXxis(Point p1, Point p2)
 {
 	if (p1.y == p2.y) // Параллельна оси "X".
@@ -31,8 +34,15 @@ int main()
 {
 	SetConsoleOutputCP(1251);
 
-	Point p1{ 3, 2 };
-	Point p2{ 3, 4 };
+	Point p1;
+	Point p2;
+
+	cout << "Введите 1 точку(x, y):\n";
+	cin >> p1.x;
+	cin >> p1.y;
+	cout << "Введите 2 точку(x, y):\n";
+	cin >> p2.x;
+	cin >> p2.y;
 
 	int result = IsParallelToOrdAxisOrAbscXxis(p1, p2);
 
