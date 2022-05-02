@@ -6,6 +6,10 @@
 Fraction) и возвращать дробь в качестве результата.
 */
 // НЕ РАБОТАЕТ
+// сложения -> работает
+// вычитания ->
+// умножения ->
+// деления -> 
 //2:10:00
 
 #include <iostream>
@@ -16,6 +20,7 @@ using std::endl;
 // локальное объявление структуры
 struct Fraction
 {
+	int whole;
 	int numerator; // числитель
 	int denominator; // знаменатель
 };
@@ -26,64 +31,139 @@ int GCD(int a, int b)
 	return b == 0 ? a : GCD(b, a % b);
 }
 
+// Функция сокращения дробей
+Fraction FractReduction(Fraction f)
+{
+	Fraction result{};
+
+	int nod = GCD(f.numerator, f.denominator);
+	if (nod == 1)
+		return f;
+	else
+	{
+		result.whole = f.whole; // 0
+		result.numerator = f.numerator / nod; // 1
+		result.denominator = f.denominator / nod; // 1
+
+		if (result.numerator == result.denominator)
+		{
+			result.whole = result.whole + (result.numerator / result.denominator);
+			result.numerator = 0;
+			result.denominator = 0;
+		}
+
+		return result;
+	}
+}
+
+// Функция превращения неправильной дроби в смешанное число.
+Fraction ConvIncorFractToMixNum(Fraction f)
+{
+	Fraction result{};
+
+	result.whole = int(f.numerator / f.denominator);
+	result.numerator = f.numerator - (result.whole * f.denominator);
+	result.denominator = f.denominator;
+
+	return result;
+}
+
+// Функция превращения смешанного числа в неправильную дробь.
+Fraction ConvertMixedNumberToIncorrFraction(Fraction f)
+{
+	if (f.whole == 0)
+		return f;
+	else
+	{
+		Fraction result{};
+		result.numerator = f.whole * f.denominator + f.numerator;
+		result.denominator = f.denominator;
+
+		return result;
+	}
+}
+
 // Функция вычисляет наименьшее общее кратное (сокращенно НОК)
 int LCM(int a, int b)
 {
 	return (a * b) / GCD(a, b);
 }
 
+// Функция реализующая операцию сложения
 Fraction AdditionOfFractions(Fraction f1, Fraction f2)
 {
-	// https://allcalc.ru/node/770
+	Fraction f1Copy = f1;
+	Fraction f2Copy = f2;
+	if (f1Copy.whole > 0)
+		f1Copy = ConvertMixedNumberToIncorrFraction(f1Copy);
+	if (f2Copy.whole > 0)
+		f2Copy = ConvertMixedNumberToIncorrFraction(f2Copy);
 
 	Fraction result{};
 
-	if (f1.denominator == f2.denominator) // Сложение дробей с одинаковыми знаменателями
+	if (f1Copy.denominator == f2Copy.denominator) // Сложение дробей с одинаковыми знаменателями
 	{
-		result.numerator = f1.numerator + f2.numerator;
-		result.denominator = f1.denominator;
-		// Важно: Если есть возможность сократить дробь, то в конечный ответ мы записываем сокращенную дробь.
-		// https://allcalc.ru/node/765
+		result.whole = f1Copy.whole + f2Copy.whole;
+		result.numerator = f1Copy.numerator + f2Copy.numerator;
+		result.denominator = f1Copy.denominator;
 	}
-	else if (f1.denominator != f2.denominator) // Сложение дробей с разными знаменателями
+	else if (f1Copy.denominator != f2Copy.denominator) // Сложение дробей с разными знаменателями
 	{
 		// 1) Приводим дроби к общему знаменателю.
 		// Для этого ищем НОК - наименьшее общее кратное, для знаменателей
-		int nok = LCM(f1.denominator, f2.denominator);
+		int nok = LCM(f1Copy.denominator, f2Copy.denominator);
 
 		// Дальше домножаем дроби на дополнительные множители и получаем выражение
 		// 2) Складываем дроби.
-		result.numerator = (nok / f1.denominator * f1.numerator) + (nok / f2.denominator * f2.numerator);
+		result.numerator = (nok / f1Copy.denominator * f1Copy.numerator) + (nok / f2Copy.denominator * f2Copy.numerator);
 		result.denominator = nok;
 	}
 
+	if (result.numerator > result.denominator)
+		result = ConvIncorFractToMixNum(result);
+
+	result = FractReduction(result);
 	return result;
+}
+
+// Функция для ввода дроби
+void Input(Fraction& f)
+{
+	cout << "whole: ";
+	cin >> f.whole;
+	cout << "numerator: ";
+	cin >> f.numerator;
+	cout << "denominator: ";
+	cin >> f.denominator;
+}
+
+// Функция для вывода дроби
+void Print(Fraction f)
+{
+	cout << "\nResult:\n";
+	if (f.whole)
+		cout << f.whole << ' ';
+	if (f.numerator && f.denominator)
+		cout << f.numerator << '/' << f.denominator << endl;
 }
 
 int main()
 {
-	Fraction f1, f2, result;
+	Fraction f1{}, f2{}, result{};
 	char action;
-	cout << "Enter a fraction.\n";
-	cout << "Enter a numerator for 1 fraction: ";
-	cin >> f1.numerator;
-	cout << "Enter a denominator for 1 fraction: ";
-	cin >> f1.denominator;
+
+	cout << "Enter first fraction.\n";
+	Input(f1);
 
 	cout << "Enter an action: ";
 	cin >> action;
 
-	cout << "Enter a numerator for 2 fraction: ";
-	cin >> f2.numerator;
-	cout << "Enter a denominator for 2 fraction: ";
-	cin >> f2.denominator;
+	cout << "Enter second fraction.\n";
+	Input(f2);
 
 	result = AdditionOfFractions(f1, f2);
 
-	cout << "Result:\n"
-		<< result.numerator << endl
-		<< "--\n"
-		<< result.denominator << endl;
+	Print(result);
 
 	return 0;
 }
