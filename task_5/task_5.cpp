@@ -5,7 +5,6 @@
 качестве входных параметров две дроби (две переменные типа
 Fraction) и возвращать дробь в качестве результата.
 */
-// НЕ РАБОТАЕТ
 // сложения -> работает
 // вычитания ->
 // умножения ->
@@ -20,7 +19,7 @@ using std::endl;
 // локальное объявление структуры
 struct Fraction
 {
-	int whole;
+	int whole; // целое
 	int numerator; // числитель
 	int denominator; // знаменатель
 };
@@ -69,7 +68,7 @@ Fraction ConvIncorFractToMixNum(Fraction f)
 }
 
 // Функция превращения смешанного числа в неправильную дробь.
-Fraction ConvertMixedNumberToIncorrFraction(Fraction f)
+Fraction ConvMixedNumToIncorrFract(Fraction f)
 {
 	if (f.whole == 0)
 		return f;
@@ -95,26 +94,25 @@ Fraction AdditionOfFractions(Fraction f1, Fraction f2)
 	Fraction f1Copy = f1;
 	Fraction f2Copy = f2;
 	if (f1Copy.whole > 0)
-		f1Copy = ConvertMixedNumberToIncorrFraction(f1Copy);
+		f1Copy = ConvMixedNumToIncorrFract(f1Copy);
 	if (f2Copy.whole > 0)
-		f2Copy = ConvertMixedNumberToIncorrFraction(f2Copy);
+		f2Copy = ConvMixedNumToIncorrFract(f2Copy);
 
 	Fraction result{};
 
-	if (f1Copy.denominator == f2Copy.denominator) // Сложение дробей с одинаковыми знаменателями
+	// Сложение дробей с одинаковыми знаменателями
+	if (f1Copy.denominator == f2Copy.denominator)
 	{
 		result.whole = f1Copy.whole + f2Copy.whole;
 		result.numerator = f1Copy.numerator + f2Copy.numerator;
 		result.denominator = f1Copy.denominator;
 	}
-	else if (f1Copy.denominator != f2Copy.denominator) // Сложение дробей с разными знаменателями
+
+	// Сложение дробей с разными знаменателями
+	else if (f1Copy.denominator != f2Copy.denominator)
 	{
-		// 1) Приводим дроби к общему знаменателю.
-		// Для этого ищем НОК - наименьшее общее кратное, для знаменателей
 		int nok = LCM(f1Copy.denominator, f2Copy.denominator);
 
-		// Дальше домножаем дроби на дополнительные множители и получаем выражение
-		// 2) Складываем дроби.
 		result.numerator = (nok / f1Copy.denominator * f1Copy.numerator) + (nok / f2Copy.denominator * f2Copy.numerator);
 		result.denominator = nok;
 	}
@@ -147,6 +145,43 @@ void Print(Fraction f)
 		cout << f.numerator << '/' << f.denominator << endl;
 }
 
+// Функция выполняет вычитание дробей
+Fraction FractionSubtraction(Fraction f1, Fraction f2)
+{
+	Fraction f1Copy = f1;
+	Fraction f2Copy = f2;
+	if (f1Copy.whole > 0)
+		f1Copy = ConvMixedNumToIncorrFract(f1Copy);
+	if (f2Copy.whole > 0)
+		f2Copy = ConvMixedNumToIncorrFract(f2Copy);
+
+	Fraction result{};
+
+	// Вычитание дробей с одинаковыми знаменателями.
+	if (f1Copy.denominator == f2Copy.denominator && f1Copy.whole == 0 && f2Copy.whole == 0)
+	{
+		result.numerator = f1Copy.numerator - f2Copy.numerator;
+		result.denominator = f1Copy.denominator;
+	}
+
+	// Вычитание обычных дробей
+	else if (f1Copy.denominator != f2Copy.denominator && f1Copy.whole == 0 && f2Copy.whole == 0)
+	{
+		int nok = LCM(f1Copy.denominator, f2Copy.denominator);
+
+		result.numerator = (nok / f1Copy.denominator * f1Copy.numerator) - (nok / f2Copy.denominator * f2Copy.numerator);
+		result.denominator = nok;
+	}
+
+	if (result.numerator > result.denominator)
+		result = ConvIncorFractToMixNum(result);
+
+	result = FractReduction(result);
+	return result;
+}
+
+
+
 int main()
 {
 	Fraction f1{}, f2{}, result{};
@@ -161,7 +196,30 @@ int main()
 	cout << "Enter second fraction.\n";
 	Input(f2);
 
-	result = AdditionOfFractions(f1, f2);
+	switch (action)
+	{
+	case '+':
+		result = AdditionOfFractions(f1, f2);
+		break;
+
+	case '-':
+		result = FractionSubtraction(f1, f2);
+		break;
+
+	case '*':
+		//result = AdditionOfFractions(f1, f2);
+		break;
+
+	case '/':
+		//result = AdditionOfFractions(f1, f2);
+		break;
+
+	default:
+		cout << "Try again !" << endl;
+		break;
+	}
+
+
 
 	Print(result);
 
