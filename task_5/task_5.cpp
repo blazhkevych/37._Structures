@@ -6,7 +6,7 @@
 Fraction) и возвращать дробь в качестве результата.
 */
 // сложения -> работает
-// вычитания ->
+// вычитания -> работает
 // умножения ->
 // деления -> 
 //2:10:00
@@ -180,8 +180,6 @@ Fraction FractionSubtraction(Fraction f1, Fraction f2)
 	return result;
 }
 
-
-
 int main()
 {
 	Fraction f1{}, f2{}, result{};
@@ -218,8 +216,6 @@ int main()
 		cout << "Try again !" << endl;
 		break;
 	}
-
-
 
 	Print(result);
 
