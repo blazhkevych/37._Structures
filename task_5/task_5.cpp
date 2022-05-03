@@ -5,11 +5,7 @@
 качестве входных параметров две дроби (две переменные типа
 Fraction) и возвращать дробь в качестве результата.
 */
-// сложения -> работает
-// вычитания -> работает
-// умножения ->
-// деления -> 
-//2:10:00
+// http://spacemath.xyz/deistviya_s_drobyami/
 
 #include <iostream>
 using std::cout;
@@ -180,44 +176,98 @@ Fraction FractionSubtraction(Fraction f1, Fraction f2)
 	return result;
 }
 
+// Функция реализующая операцию умножения
+Fraction Multiplication(Fraction f1, Fraction f2)
+{
+	Fraction f1Copy = f1;
+	Fraction f2Copy = f2;
+	if (f1Copy.whole > 0)
+		f1Copy = ConvMixedNumToIncorrFract(f1Copy);
+	if (f2Copy.whole > 0)
+		f2Copy = ConvMixedNumToIncorrFract(f2Copy);
+
+	Fraction result{};
+
+	result.numerator = f1Copy.numerator * f2Copy.numerator;
+	result.denominator = f1Copy.denominator * f2Copy.denominator;
+
+	if (result.numerator > result.denominator)
+		result = ConvIncorFractToMixNum(result);
+
+	result = FractReduction(result);
+	return result;
+}
+
+// Функция реализующая операцию деления
+Fraction Division(Fraction f1, Fraction f2)
+{
+	Fraction f1Copy = f1;
+	Fraction f2Copy = f2;
+	if (f1Copy.whole > 0)
+		f1Copy = ConvMixedNumToIncorrFract(f1Copy);
+	if (f2Copy.whole > 0)
+		f2Copy = ConvMixedNumToIncorrFract(f2Copy);
+
+	int temp = f2Copy.numerator;
+	f2Copy.numerator = f2Copy.denominator;
+	f2Copy.denominator = temp;
+
+	Fraction result{};
+
+	result = Multiplication(f1Copy, f2Copy);
+
+	if (result.numerator > result.denominator)
+		result = ConvIncorFractToMixNum(result);
+
+	result = FractReduction(result);
+	return result;
+}
+
 int main()
 {
 	Fraction f1{}, f2{}, result{};
 	char action;
 
-	cout << "Enter first fraction.\n";
-	Input(f1);
+	char answer{ 0 }; // Do you want to continue?
 
-	cout << "Enter an action: ";
-	cin >> action;
-
-	cout << "Enter second fraction.\n";
-	Input(f2);
-
-	switch (action)
+	do
 	{
-	case '+':
-		result = AdditionOfFractions(f1, f2);
-		break;
+		cout << "Enter first fraction.\n";
+		Input(f1);
 
-	case '-':
-		result = FractionSubtraction(f1, f2);
-		break;
+		cout << "Enter an action: ";
+		cin >> action;
 
-	case '*':
-		//result = AdditionOfFractions(f1, f2);
-		break;
+		cout << "Enter second fraction.\n";
+		Input(f2);
 
-	case '/':
-		//result = AdditionOfFractions(f1, f2);
-		break;
+		switch (action)
+		{
+		case '+':
+			result = AdditionOfFractions(f1, f2);
+			break;
 
-	default:
-		cout << "Try again !" << endl;
-		break;
-	}
+		case '-':
+			result = FractionSubtraction(f1, f2);
+			break;
 
-	Print(result);
+		case '*':
+			result = Multiplication(f1, f2);
+			break;
+
+		case '/':
+			result = Division(f1, f2);
+			break;
+		}
+
+		Print(result);
+
+		cout << endl;
+		cout << "Do you want to continue? ( y (yes) / n (no) )\n";
+		cin >> answer;
+		cout << endl;
+
+	} while (answer == 'y');
 
 	return 0;
 }
